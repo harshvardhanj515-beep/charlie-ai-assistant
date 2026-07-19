@@ -1,0 +1,37 @@
+# Virtual Environment
+venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Environment variables
+.env
+.env.*
+
+# Database
+*.db
+*.sqlite3
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Charlie Specific files
+config/tasks.json
+config/contacts.json
+screenshots/
+demo image of anime to made/
+diagnostic_browser.py
+screenshot_tester.py
+copy_code.ps1
+screenshot_*.png
+test_browser.py
+modules/_tmp_speech.wav

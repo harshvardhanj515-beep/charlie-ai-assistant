@@ -6,7 +6,7 @@
 
 **An intelligent modular AI desktop assistant built with Python, featuring offline voice interaction, a real-time 3D VRM avatar, intelligent memory, and desktop automation.**
 
-[![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![Platform](https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white)](https://microsoft.com)
 [![License](https://img.shields.io/badge/License-MIT-4CAF50?style=for-the-badge)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge)](CONTRIBUTING.md)
@@ -103,7 +103,7 @@ graph TD
 ## 🛠️ Installation & Setup
 
 ### Prerequisites
-- Python 3.12+
+- Python 3.11+
 - Windows OS (Linux/macOS support planned)
 - [Ollama](https://ollama.ai) installed locally (if using local inference)
 

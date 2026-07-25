@@ -22,7 +22,7 @@ from openwakeword.model import Model
 import sys
 
 sys.path.append("..")
-from config.settings import WAKE_WORD_SENSITIVITY
+from charlie.core.settings import WAKE_WORD_SENSITIVITY
 
 
 class WakeWordDetector:

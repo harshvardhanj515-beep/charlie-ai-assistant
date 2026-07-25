@@ -9,7 +9,7 @@ import random
 import sys
 
 sys.path.append("..")
-from config.settings import ACTIVITY_ENABLED, ACTIVITY_CHECK_INTERVAL_SECONDS, ACTIVITY_PROACTIVE_CHANCE
+from charlie.core.settings import ACTIVITY_ENABLED, ACTIVITY_CHECK_INTERVAL_SECONDS, ACTIVITY_PROACTIVE_CHANCE
 
 class ActivityMonitor:
     def __init__(self, on_activity_change=None):

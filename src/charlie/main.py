@@ -29,23 +29,23 @@ os.environ.setdefault(
     "--ignore-gpu-blacklist --enable-gpu-rasterization --enable-native-gpu-memory-buffers --enable-webgl"
 )
 
-from config.settings import (
+from charlie.core.settings import (
     USER_NAME, CAMERA_ENABLED, ACTIVITY_ENABLED,
     CONTINUOUS_CONVERSATION_ENABLED, CONTINUOUS_CONVERSATION_WINDOW_SECONDS,
     EMOTION_PROACTIVE_CHANCE,
 )
-from modules.wake_word_module import WakeWordDetector
-from modules.stt_module import SpeechToText
-from modules.brain_module import get_brain
-from modules.tts_module import get_tts_engine
-from modules.pc_control_module import execute
-from modules.avatar_module import AvatarController
-from modules.activity_module import ActivityMonitor
-from modules.project_module_auto import AutoProjectSession
-from modules.routines_module import run_routine
+from charlie.modules.wake_word_module import WakeWordDetector
+from charlie.modules.stt_module import SpeechToText
+from charlie.modules.brain_module import get_brain
+from charlie.modules.tts_module import get_tts_engine
+from charlie.modules.pc_control_module import execute
+from charlie.modules.avatar_module import AvatarController
+from charlie.modules.activity_module import ActivityMonitor
+from charlie.modules.project_module_auto import AutoProjectSession
+from charlie.modules.routines_module import run_routine
 
 if CAMERA_ENABLED:
-    from modules.camera_module import EmotionMonitor
+    from charlie.modules.camera_module import EmotionMonitor
 
 from PyQt5.QtWidgets import QSystemTrayIcon, QMenu, QAction, QShortcut, QStyle
 from PyQt5.QtGui import QKeySequence

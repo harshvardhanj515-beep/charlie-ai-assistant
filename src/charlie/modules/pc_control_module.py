@@ -18,8 +18,8 @@ import os
 import datetime
 
 sys.path.append("..")
-from config.settings import TASKS_FILE, APP_PATHS
-from modules.pc_control_extensions import EXTRA_ACTIONS
+from charlie.core.settings import TASKS_FILE, APP_PATHS
+from charlie.modules.pc_control_extensions import EXTRA_ACTIONS
 
 SYSTEM = platform.system()  # "Windows", "Darwin" (Mac), "Linux"
 

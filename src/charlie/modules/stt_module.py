@@ -15,7 +15,7 @@ import queue
 import sys
 
 sys.path.append("..")
-from config.settings import STT_MODEL_SIZE, STT_DEVICE
+from charlie.core.settings import STT_MODEL_SIZE, STT_DEVICE
 
 
 class SpeechToText:

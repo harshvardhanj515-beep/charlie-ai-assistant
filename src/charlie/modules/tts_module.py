@@ -25,7 +25,7 @@ import sounddevice as sd
 from piper.voice import PiperVoice
 
 sys.path.append("..")
-from config.settings import TTS_RATE
+from charlie.core.settings import TTS_RATE
 
 
 def _estimate_viseme(pcm, sample_rate):
@@ -166,7 +166,7 @@ class CoquiTTS:
 
 
 def get_tts_engine():
-    from config.settings import TTS_ENGINE
+    from charlie.core.settings import TTS_ENGINE
     if TTS_ENGINE == "coqui":
         return CoquiTTS()
     return StreamingPiperTTS()

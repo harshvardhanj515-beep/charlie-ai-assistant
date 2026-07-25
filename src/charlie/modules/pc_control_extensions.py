@@ -29,7 +29,7 @@ import time
 import subprocess
 
 sys.path.append("..")
-from config.settings import APP_PATHS, BROWSER_PATHS
+from charlie.core.settings import APP_PATHS, BROWSER_PATHS
 
 
 # ---------------------------------------------------------------------------
@@ -94,7 +94,7 @@ def focus_app(params):
         # in pc_control_module.py. Imported here (not at module top) to
         # avoid a circular import, since pc_control_module imports
         # EXTRA_ACTIONS from this file.
-        from modules.pc_control_module import open_app as pc_open_app
+        from charlie.modules.pc_control_module import open_app as pc_open_app
         ok = pc_open_app(params.get("app_name", ""))
         return {"success": ok}
 

@@ -22,7 +22,7 @@ Example settings.py entry:
 
 import sys
 sys.path.append("..")
-from config.settings import ROUTINES
+from charlie.core.settings import ROUTINES
 
 
 def run_routine(routine_name, execute_fn):

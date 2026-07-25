@@ -24,9 +24,9 @@ import sys
 import time
 
 sys.path.append("..")
-from config.settings import CLOUD_API_KEY
-from modules.pc_control_extensions import clipboard_set
-from modules.pc_control_module import open_app
+from charlie.core.settings import CLOUD_API_KEY
+from charlie.modules.pc_control_extensions import clipboard_set
+from charlie.modules.pc_control_module import open_app
 
 PROMPT_TEMPLATE = """You are helping turn a task description into a precise, actionable prompt
 for Antigravity, an AI coding assistant, for the project "{project_name}".

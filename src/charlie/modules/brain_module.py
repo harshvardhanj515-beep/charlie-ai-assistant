@@ -20,9 +20,9 @@ import threading
 import sys
 
 sys.path.append("..")
-from config.settings import BRAIN_MODE, OLLAMA_MODEL, USER_NAME, CLOUD_API_KEY
-from modules.memory_module import MemoryManager
-from modules.contacts_module import ContactsManager
+from charlie.core.settings import BRAIN_MODE, OLLAMA_MODEL, USER_NAME, CLOUD_API_KEY
+from charlie.modules.memory_module import MemoryManager
+from charlie.modules.contacts_module import ContactsManager
 
 # Minimum words to buffer before speaking a chunk even without terminal
 # punctuation yet. Lower = starts talking sooner but in choppier pieces.

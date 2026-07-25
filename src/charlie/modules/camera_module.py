@@ -35,7 +35,7 @@ import threading
 import sys
 
 sys.path.append("..")
-from config.settings import CAMERA_INDEX, EMOTION_CHECK_INTERVAL_SECONDS, EMOTION_CONFIDENCE_THRESHOLD
+from charlie.core.settings import CAMERA_INDEX, EMOTION_CHECK_INTERVAL_SECONDS, EMOTION_CONFIDENCE_THRESHOLD
 
 
 class EmotionMonitor:

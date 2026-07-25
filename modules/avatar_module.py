@@ -18,7 +18,6 @@ try:
     httpd = socketserver.TCPServer(("127.0.0.1", PORT), Handler)
     threading.Thread(target=httpd.serve_forever, daemon=True).start()
 except OSError:
-    # Port already in use. Verify the existing server is serving our assets.
     import urllib.request
     try:
         req = urllib.request.urlopen(f"http://127.0.0.1:{PORT}/vrm_engine.html", timeout=2)
@@ -34,6 +33,8 @@ class WebBridge(QObject):
     listeningStatusChanged = pyqtSignal(bool)
     backgroundChanged = pyqtSignal(str)
     visemeChanged = pyqtSignal(str)  # JSON string: {"aa":0.2,"ih":0.0,"ou":0.6,"ee":0.0,"oh":0.1}
+    statusTextChanged = pyqtSignal(str)  # e.g. "🧠 Thinking...", "⚡ Executing...", "" to hide
+    smilePulseRequested = pyqtSignal()  # brief post-response smile, no payload needed
 
     def set_volume(self, vol):
         self.volumeChanged.emit(vol)
@@ -47,6 +48,12 @@ class WebBridge(QObject):
     def set_viseme(self, viseme_json):
         self.visemeChanged.emit(viseme_json)
 
+    def set_status_text(self, text):
+        self.statusTextChanged.emit(text)
+
+    def flash_smile(self):
+        self.smilePulseRequested.emit()
+
 class AvatarController(QWidget):
     modeRequested = pyqtSignal(str)
 
@@ -58,43 +65,32 @@ class AvatarController(QWidget):
         
         from PyQt5.QtWebEngineWidgets import QWebEngineSettings
         self.browser = QWebEngineView(self)
+        self.browser.setAttribute(Qt.WA_OpaquePaintEvent, False)
+        self.browser.setAttribute(Qt.WA_TranslucentBackground, True)
+        self.browser.setStyleSheet("background: transparent; border: none;")
         self.browser.settings().setAttribute(QWebEngineSettings.LocalContentCanAccessRemoteUrls, True)
         self.browser.settings().setAttribute(QWebEngineSettings.LocalContentCanAccessFileUrls, True)
-        # Force GPU acceleration for WebGL rendering (Three.js) — without this,
-        # QtWebEngine can silently fall back to software rendering, which is
-        # what causes choppy/stuttering avatar animation.
         self.browser.settings().setAttribute(QWebEngineSettings.WebGLEnabled, True)
         self.browser.settings().setAttribute(QWebEngineSettings.Accelerated2dCanvasEnabled, True)
         self.browser.page().setBackgroundColor(Qt.transparent)
-        self.browser.resize(400, 500)
         
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.browser)
-        
-        self.resize(400, 500)
-        
-        screen = QApplication.primaryScreen().geometry()
-        self.move(screen.width() - 420, screen.height() - 520)
         
         self.bridge = WebBridge()
         self.channel = QWebChannel()
         self.channel.registerObject("bridge", self.bridge)
         self.browser.page().setWebChannel(self.channel)
         
-        # Clear cache to force loading patched JS files
         self.browser.page().profile().clearHttpCache()
-        
-        # Load the WebGL engine via the local HTTP server to bypass file:/// CORS restrictions
         self.browser.setUrl(QUrl(f"http://127.0.0.1:{PORT}/vrm_engine.html"))
         
         self.current_state = "idle"
-        
-        # Default to Cinematic Mode
-        from PyQt5.QtCore import QTimer
-        QTimer.singleShot(1000, self.set_cinematic_mode)
-        
         self.modeRequested.connect(self._handle_mode_request)
+        
+        # Start natively in cinematic mode
+        self.set_cinematic_mode()
 
     def _handle_mode_request(self, mode):
         if mode == "cinematic" or mode == "fullscreen":
@@ -103,20 +99,20 @@ class AvatarController(QWidget):
             self.set_widget_mode()
 
     def set_cinematic_mode(self):
-        
         screen = QApplication.primaryScreen().geometry()
         self.setGeometry(screen)
         self.browser.setFixedSize(screen.width(), screen.height())
-        
         self.showFullScreen()
         self.bridge.modeChanged.emit("cinematic")
 
     def set_widget_mode(self):
+        self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
         self.showNormal()
         self.browser.setFixedSize(400, 500)
         self.resize(400, 500)
         screen = QApplication.primaryScreen().geometry()
         self.move(screen.width() - 420, screen.height() - 520)
+        self.show()
         self.bridge.modeChanged.emit("widget")
 
     def set_state(self, state):
@@ -128,3 +124,9 @@ class AvatarController(QWidget):
 
     def set_viseme(self, viseme_json):
         self.bridge.set_viseme(viseme_json)
+
+    def set_status_text(self, text):
+        self.bridge.set_status_text(text)
+
+    def flash_smile(self):
+        self.bridge.flash_smile()

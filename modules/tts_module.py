@@ -76,32 +76,37 @@ class StreamingPiperTTS:
         print("[TTS] Loading Piper TTS voice model...")
         self.voice = PiperVoice.load(model_path, config_path=config_path)
         self.sample_rate = self.voice.config.sample_rate
-        print("[TTS] Piper voice loaded (streaming mode).")
+        print("[TTS] Piper voice loaded. Warming up ONNX runtime...")
+        # Warm up the ONNX graph by generating audio for a single word silently
+        for _ in self.voice.synthesize("test"):
+            pass
+        print("[TTS] Piper voice warmed up and ready (streaming mode).")
 
         self.speech_queue = queue.Queue()
         self.worker_thread = threading.Thread(target=self._process_queue, daemon=True)
         self.worker_thread.start()
 
-    def speak(self, text, on_volume=None, on_viseme=None):
+    def speak(self, text, on_volume=None, on_viseme=None, hidden=False):
         # Push to queue and return immediately so the LLM stream can keep producing
-        self.speech_queue.put((text, on_volume, on_viseme))
+        self.speech_queue.put((text, on_volume, on_viseme, hidden))
 
     def wait(self):
         self.speech_queue.join()
 
     def _process_queue(self):
         while True:
-            text, on_volume, on_viseme = self.speech_queue.get()
+            text, on_volume, on_viseme, hidden = self.speech_queue.get()
             try:
-                self._synthesize_and_stream(text, on_volume, on_viseme)
+                self._synthesize_and_stream(text, on_volume, on_viseme, hidden)
             except Exception as e:
                 print(f"[TTS Error] {e}")
             finally:
                 self.speech_queue.task_done()
 
-    def _synthesize_and_stream(self, text, on_volume, on_viseme):
+    def _synthesize_and_stream(self, text, on_volume, on_viseme, hidden):
         with self._lock:
-            print(f"[Charlie] {text}")
+            if not hidden:
+                print(f"[Charlie] {text}")
 
             stream = sd.OutputStream(
                 samplerate=self.sample_rate,
@@ -146,8 +151,9 @@ class CoquiTTS:
         from TTS.api import TTS
         self.tts = TTS(model_name="tts_models/en/ljspeech/tacotron2-DDC", progress_bar=False)
 
-    def speak(self, text):
-        print(f"[Charlie] {text}")
+    def speak(self, text, hidden=False):
+        if not hidden:
+            print(f"[Charlie] {text}")
         self.tts.tts_to_file(text=text, file_path="modules/_tmp_speech.wav")
         import sounddevice as sd
         import soundfile as sf

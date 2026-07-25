@@ -24,7 +24,7 @@ TTS_ENGINE = "pyttsx3"  # "pyttsx3" (instant, offline, robotic) or "coqui" (bett
 TTS_RATE = 175  # words per minute for pyttsx3
 
 # --- Camera / emotion module ---
-CAMERA_ENABLED = False  # OFF by default. Read camera_module.py notes before enabling.
+CAMERA_ENABLED = True
 CAMERA_INDEX = 0
 EMOTION_CHECK_INTERVAL_SECONDS = 15  # how often to sample, NOT continuous frame-by-frame
 EMOTION_CONFIDENCE_THRESHOLD = 0.6  # only act on emotion reads above this confidence
@@ -39,15 +39,47 @@ ACTIVITY_PROACTIVE_CHANCE = 0.2  # 20% chance to speak up when activity changes
 
 # --- App Launcher Paths ---
 APP_PATHS = {
-    "antigravity": r"C:\Users\Harshvardhan Sheikh\Downloads\Antigravity.exe",
-    "chrome": r"C:\Program Files\Google\Chrome\Application\chrome.exe",
-    "firefox": r"C:\Program Files\Mozilla Firefox\firefox.exe",
+    # Web Apps
     "chatgpt": "https://chatgpt.com",
     "claude": "https://claude.ai",
     "gemini": "https://gemini.google.com",
     "whatsapp": "https://web.whatsapp.com",
     "whatsapp web": "https://web.whatsapp.com",
     "web whatsapp": "https://web.whatsapp.com",
+    
+    # User's System Applications (Auto-discovered)
+    "chrome": r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+    "google chrome": r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+    "clown": r"C:\Program Files\Google\Chrome\Application\chrome.exe", # Whisper hallucination for Chrome
+    "gemini": "https://gemini.google.com",
+    "chatgpt": "https://chatgpt.com",
+    "gemini chatgpt": "https://gemini.google.com",
+    "antigravity": r"C:\Users\Harshvardhan Sheikh\AppData\Local\Programs\Antigravity\Antigravity.exe",
+    "and integrity": r"C:\Users\Harshvardhan Sheikh\AppData\Local\Programs\Antigravity\Antigravity.exe", # Whisper hallucination
+    "integrity": r"C:\Users\Harshvardhan Sheikh\AppData\Local\Programs\Antigravity\Antigravity.exe",
+    "obs": r"C:\Program Files\obs-studio\bin\64bit\obs64.exe",
+    "obs studio": r"C:\Program Files\obs-studio\bin\64bit\obs64.exe",
+    "obvious": r"C:\Program Files\obs-studio\bin\64bit\obs64.exe", # Whisper hallucination
+    "calculator": r"C:\Windows\system32\win32calc.exe",
+    "notepad": r"C:\Windows\system32\notepad.exe",
+    "paint": r"C:\Windows\system32\mspaint.exe",
+    "git bash": r"C:\Program Files\Git\git-bash.exe",
+    "get bash": r"C:\Program Files\Git\git-bash.exe", # Whisper hallucination
+    "handbrake": r"C:\Program Files\HandBrake\HandBrake.exe",
+    "torrent": r"C:\Program Files\qBittorrent\qbittorrent.exe",
+    "qbittorrent": r"C:\Program Files\qBittorrent\qbittorrent.exe",
+    "vlc": r"C:\Program Files (x86)\VideoLAN\VLC\vlc.exe",
+    "edge": r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
+    "microsoft edge": r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
+    "ollama": r"C:\Users\Harshvardhan Sheikh\AppData\Local\Programs\Ollama\ollama app.exe",
+    "vroid": r"C:\Users\Harshvardhan Sheikh\AppData\Local\Programs\VRoidStudio\2.14.0\VRoidStudio.exe",
+    "vroid studio": r"C:\Users\Harshvardhan Sheikh\AppData\Local\Programs\VRoidStudio\2.14.0\VRoidStudio.exe",
+    "vscode": r"C:\Users\Harshvardhan Sheikh\AppData\Local\Programs\Microsoft VS Code\Code.exe",
+    "vs code": r"C:\Users\Harshvardhan Sheikh\AppData\Local\Programs\Microsoft VS Code\Code.exe",
+    "visual studio code": r"C:\Users\Harshvardhan Sheikh\AppData\Local\Programs\Microsoft VS Code\Code.exe",
+    "zoom": r"C:\Users\Harshvardhan Sheikh\AppData\Roaming\Zoom\bin\Zoom.exe",
+    "assassins creed": r"C:\Games\Assassin's Creed - Rogue\ACC.exe",
+    "assassin's creed": r"C:\Games\Assassin's Creed - Rogue\ACC.exe",
 }
 BROWSER_PATHS = {
     "chrome": r"C:\Program Files\Google\Chrome\Application\chrome.exe",
@@ -70,3 +102,11 @@ ROUTINES = {
     ],
 }
 CONTACTS_FILE = "config/contacts.json"
+
+# --- Continuous Conversation Window ---
+CONTINUOUS_CONVERSATION_ENABLED = True
+CONTINUOUS_CONVERSATION_WINDOW_SECONDS = 6
+
+
+EMOTION_PROACTIVE_CHANCE = 0.3
+

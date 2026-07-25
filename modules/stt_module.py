@@ -39,8 +39,8 @@ class SpeechToText:
             sd.wait()
             audio_float = audio.astype(np.float32) / 32768.0
             noise_level = np.abs(audio_float).mean()
-            # Lowered threshold multiplier to 1.2x (from 1.5x) so she picks up quieter voices better
-            self.dynamic_silence_threshold = max(0.0005, noise_level * 1.2)
+            # Increased threshold multiplier to 1.8x so background noise doesn't keep the mic open for 5+ seconds
+            self.dynamic_silence_threshold = max(0.0005, noise_level * 1.8)
             print(f"[STT] Calibration complete! Noise level: {noise_level:.6f}, Threshold set to: {self.dynamic_silence_threshold:.6f}")
         except Exception as e:
             try:
@@ -59,21 +59,20 @@ class SpeechToText:
         sd.wait()
         return audio.flatten().astype(np.float32) / 32768.0
 
-    def record_until_silence(self, silence_duration=0.35, max_duration=15):
+    def record_until_silence(self, silence_duration=0.5, max_duration=15, wait_timeout=1.2):
         """Better UX than a fixed timer: stops listening as soon as you stop
         talking, instead of waiting out a fixed 5 seconds every time. This is
         what actually removes perceived delay for the user.
-
-        silence_duration lowered from 0.5 -> 0.35s, and the minimum-recording
-        gate below lowered from 40 chunks (~4s) -> 22 chunks (~1.8s), so short
-        replies like "yes" or "cancel" don't force an unnecessarily long wait
-        before Charlie reacts."""
+        """
         print("[STT] Listening (will stop automatically on silence)...")
         chunks = []
         silent_chunks_needed = int(silence_duration * self.sample_rate / 1024)
         silent_count = 0
         max_chunks = int(max_duration * self.sample_rate / 1024)
-        MIN_CHUNKS_BEFORE_SILENCE_CHECK = 22  # ~1.8s at 1024-sample blocks / 16kHz
+        
+        has_started_speaking = False
+        import time
+        wait_start_time = time.time()
 
         q = queue.Queue()
 
@@ -92,12 +91,19 @@ class SpeechToText:
                         
                     chunks.append(chunk)
                     volume = np.abs(chunk.astype(np.float32) / 32768.0).mean()
-                    if (volume < self.dynamic_silence_threshold):
+                    
+                    if volume > self.dynamic_silence_threshold * 1.5:
+                        has_started_speaking = True
+                        silent_count = 0
+                    else:
                         silent_count += 1
-                        if silent_count >= silent_chunks_needed and len(chunks) > MIN_CHUNKS_BEFORE_SILENCE_CHECK:
+                        
+                    if has_started_speaking:
+                        if silent_count >= silent_chunks_needed:
                             break
                     else:
-                        silent_count = 0
+                        if (time.time() - wait_start_time) > wait_timeout:
+                            break
         except Exception as e:
             try:
                 dev = sd.query_devices(sd.default.device[0], 'input')
@@ -109,31 +115,47 @@ class SpeechToText:
         result_audio = np.concatenate(chunks).flatten().astype(np.float32) / 32768.0
         max_vol = np.max(np.abs(result_audio))
         print(f"[STT] Finished recording {len(result_audio)/self.sample_rate:.1f} seconds. Max volume recorded: {max_vol:.6f}")
-        if max_vol < 0.001:
-            print("[STT] WARNING: The recorded audio is almost perfectly silent! Your microphone might be muted or denied permission in Windows.")
+        
+        # Aggressively drop audio that never got significantly louder than background noise
+        if max_vol < max(0.001, self.dynamic_silence_threshold * 1.5):
+            print(f"[STT] Audio was too quiet to be real speech (Max Vol: {max_vol:.6f}). Discarding to prevent hallucinations.")
+            return np.array([])
             
         return result_audio
 
     def transcribe(self, audio):
+        if len(audio) == 0:
+            return ""
+            
         segments, info = self.model.transcribe(
             audio, 
-            language="en", 
+            language="en",
+            initial_prompt="Charlie, ChatGPT, Gemini, Claude, Notepad, Firefox, Chrome, Spotify, YouTube, Arijit Singh, play, open, stop.",
             beam_size=1, 
             condition_on_previous_text=False,
-            no_speech_threshold=0.6,
+            vad_filter=True,
+            vad_parameters=dict(min_silence_duration_ms=500, threshold=0.7), # Strict VAD
+            no_speech_threshold=0.4, # Drop if 40% confident it's silence
             log_prob_threshold=-1.0,
-            compression_ratio_threshold=1.4  # Aggressively drops text if it detects the AI repeating itself
+            compression_ratio_threshold=1.4
         )
         text = " ".join(seg.text for seg in segments).strip()
         print(f"[STT DEBUG] Raw whisper transcription: '{text}'")
         
-        # Filter out known Whisper background-noise hallucinations
+        lower_text = text.lower().strip(" .!?\n")
+        
+        # Filter exact-match single-word hallucinations
+        if lower_text in ["you", "yeah", "i", "bye", "ok", "okay", "thank you", "thanks", "hello", "the", "a", "it", "so", "and"]:
+            print(f"[STT] Dropped likely short hallucination: '{text}'")
+            return ""
+
+        # Filter out known Whisper background-noise hallucination substrings
         hallucinations = [
             "bozzi", "amara.org", "thanks for watching", "thank you for watching",
-            "subscribe to our channel", "press the bell icon", "get notified"
+            "subscribe to our channel", "press the bell icon", "get notified",
+            "subtitles by", "translated by", "captioned by"
         ]
         
-        lower_text = text.lower()
         for h in hallucinations:
             if h in lower_text:
                 return ""

@@ -21,42 +21,33 @@
             left: 50%;
             transform: translateX(-50%);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-size: 24px;
-            font-weight: bold;
+            font-size: 22px;
+            font-weight: 600;
             color: #ffffff;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 10px 20px;
-            border-radius: 30px;
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+            /* Glass panel: stronger blur + soft border + layered shadow reads
+               more premium than the old flat dark chip. */
+            background: rgba(20, 24, 34, 0.45);
+            padding: 12px 26px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), 0 0 20px rgba(0, 255, 255, 0.15);
             display: none;
             z-index: 100;
-            backdrop-filter: blur(5px);
-            animation: pulse 1.5s infinite;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            animation: pulse 1.6s infinite;
+            white-space: nowrap;
         }
         @keyframes pulse {
-            0% { opacity: 0.8; box-shadow: 0 0 10px rgba(0, 255, 255, 0.5); }
-            50% { opacity: 1; box-shadow: 0 0 20px rgba(0, 255, 255, 1.0); }
-            100% { opacity: 0.8; box-shadow: 0 0 10px rgba(0, 255, 255, 0.5); }
+            0% { opacity: 0.85; box-shadow: 0 8px 32px rgba(0,0,0,0.35), 0 0 12px rgba(0, 255, 255, 0.35); }
+            50% { opacity: 1; box-shadow: 0 8px 32px rgba(0,0,0,0.35), 0 0 24px rgba(0, 255, 255, 0.7); }
+            100% { opacity: 0.85; box-shadow: 0 8px 32px rgba(0,0,0,0.35), 0 0 12px rgba(0, 255, 255, 0.35); }
         }
     </style>
     <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "./vendor/three/build/three.module.js",
-                "three/addons/": "./vendor/three/examples/jsm/"
-            }
-        }
-    </script>
 </head>
 <body>
-    <div id="status-indicator">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="white" style="vertical-align: middle; margin-right: 8px; margin-bottom: 3px;">
-            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
-            <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
-        </svg>
-        Listening...
-    </div>
+    <div id="status-indicator"></div>
     <div id="debug-panel" style="display:none; position:absolute; top:10px; left:10px; background:rgba(0,0,0,0.8); color:lime; padding:10px; font-family:monospace; z-index:1000; font-size:12px;">
         <b>Pose Debugger</b><br>
         <label><input type="checkbox" id="debug_enable"> Enable Sliders</label>
@@ -82,9 +73,7 @@
         LHz: <input type="range" id="lh_z" min="-3.14" max="3.14" step="0.05" value="0"><span id="val_lh_z">0</span><br>
         LFc: <input type="range" id="lf_c" min="-1.5" max="1.5" step="0.05" value="0"><span id="val_lf_c">0</span> (Fingers)<br>
     </div>
-    </div>
     <script type="module">
-        // Suppress benign Three.js warnings from flooding the Python console
         const origWarn = console.warn;
         console.warn = function(...args) {
             if (args[0] && typeof args[0] === 'string') {
@@ -120,7 +109,6 @@
         const scene = new THREE.Scene();
         
         const camera = new THREE.PerspectiveCamera(30.0, window.innerWidth / window.innerHeight, 0.1, 20.0);
-        // Moved closer (Z from 1.5 to 0.7) and slightly lower (Y from 1.4 to 1.3) to frame waist-up
         camera.position.set(0.0, 1.3, 0.7); 
 
         const mouseNDC = new THREE.Vector2(0, 0);
@@ -131,24 +119,20 @@
 
         const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        // Clamp pixel ratio — on a high-DPI laptop screen, an uncapped
-        // devicePixelRatio can mean rendering 3-4x more pixels than the
-        // display actually needs, which is a common, easy-to-miss cause
-        // of choppy Three.js animation on WebEngine.
         renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
         renderer.setClearColor(0x000000, 0); 
         document.body.appendChild(renderer.domElement);
 
-        const light = new THREE.DirectionalLight(0xffffff, 1.5);
+        const light = new THREE.DirectionalLight(0xffffff);
         light.position.set(1.0, 1.0, 1.0).normalize();
         scene.add(light);
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+        
+        const ambientLight = new THREE.AmbientLight(0xaaaaaa);
         scene.add(ambientLight);
 
         let currentVrm = null;
         let clock = new THREE.Clock();
         
-        // Target for eye contact
         const lookAtTarget = new THREE.Object3D();
         scene.add(lookAtTarget);
 
@@ -178,6 +162,7 @@
                 window.lipSyncVolume = 0;
                 window.currentVisemes = { aa: 0, ih: 0, ou: 0, ee: 0, oh: 0 };
                 window.targetVisemes = { aa: 0, ih: 0, ou: 0, ee: 0, oh: 0 };
+                window.smilePulse = 0; // 0-1, decays over time, added on top of normal expression
                 
                 setTimeout(() => { if (window.currentAnimation === 'startup') window.currentAnimation = 'idle'; }, 2500);
             },
@@ -217,7 +202,7 @@
                 const lLittle = h.getNormalizedBoneNode('leftLittleProximal');
                 const lThumb = h.getNormalizedBoneNode('leftThumbProximal');
                 
-                // --- 2.1 Micro-Motions (Blinking) ---
+                // --- Blinking ---
                 window.blinkTimer += clampedDelta;
                 if (window.blinkTimer > window.nextBlink) {
                     const blinkProgress = window.blinkTimer - window.nextBlink;
@@ -225,11 +210,11 @@
                     if (blinkProgress < blinkDuration) {
                         let blinkVal = 0;
                         if (blinkProgress < blinkDuration * 0.33) {
-                            blinkVal = blinkProgress / (blinkDuration * 0.33); // ramp up
+                            blinkVal = blinkProgress / (blinkDuration * 0.33);
                         } else if (blinkProgress < blinkDuration * 0.66) {
-                            blinkVal = 1.0; // hold closed
+                            blinkVal = 1.0;
                         } else {
-                            blinkVal = 1.0 - ((blinkProgress - blinkDuration * 0.66) / (blinkDuration * 0.34)); // ramp down
+                            blinkVal = 1.0 - ((blinkProgress - blinkDuration * 0.66) / (blinkDuration * 0.34));
                         }
                         currentVrm.expressionManager.setValue('blink', blinkVal);
                     } else {
@@ -241,8 +226,7 @@
                     currentVrm.expressionManager.setValue('blink', 0.0);
                 }
                 
-                // --- 2.1 Micro-Motions (Idle Sway & Jitter) ---
-                // Layered under breathing, using summed sine waves for organic non-periodic noise
+                // --- Idle sway (breathing-like) ---
                 const spineNoise1 = Math.sin(time * 1.7) * 0.4 + Math.sin(time * 0.8) * 0.6;
                 const spineNoise2 = Math.sin(time * 1.3 + 1.1) * 0.4 + Math.sin(time * 0.5 + 2.3) * 0.6;
                 const headNoise1 = Math.sin(time * 0.8) * 0.4 + Math.sin(time * 0.3) * 0.6;
@@ -250,10 +234,7 @@
                 let tSpine = new THREE.Euler(spineNoise1 * 0.015, 0, spineNoise2 * 0.015);
                 let tHead = new THREE.Euler(headNoise1 * 0.01, headNoise2 * 0.02, 0);
                 
-                // --- 2.2 Speech Liveliness + Multi-viseme lipsync ---
-                // Smoothly interpolate each viseme toward its latest target
-                // instead of snapping, so mouth shapes blend into each other
-                // rather than popping between poses.
+                // --- Multi-viseme lipsync ---
                 const visemeLerpSpeed = 18;
                 let totalMouthOpen = 0;
                 for (const key of ['aa', 'ih', 'ou', 'ee', 'oh']) {
@@ -266,13 +247,30 @@
                 }
 
                 if (totalMouthOpen > 0.05) {
-                    tHead.x -= totalMouthOpen * 0.15; // Micro head-bob driven by mouth activity
-                    currentVrm.expressionManager.setValue('surprised', totalMouthOpen * 0.3); // Eyebrow raise
+                    tHead.x -= totalMouthOpen * 0.15;
+                    currentVrm.expressionManager.setValue('surprised', totalMouthOpen * 0.3);
                 } else {
                     currentVrm.expressionManager.setValue('surprised', 0.0);
                 }
+
+                // --- Post-response smile pulse ---
+                // A short-lived expression bump triggered from Python once a
+                // reply finishes, decaying back to whatever the idle
+                // expression would normally be. Layered independently of
+                // currentAnimation so it doesn't fight the pose logic below.
+                if (window.smilePulse > 0) {
+                    window.smilePulse = Math.max(0, window.smilePulse - clampedDelta / 1.4);
+                    currentVrm.expressionManager.setValue('happy', Math.max(
+                        currentVrm.expressionManager.getValue('happy') || 0,
+                        window.smilePulse * 0.6
+                    ));
+                    currentVrm.expressionManager.setValue('relaxed', Math.max(
+                        currentVrm.expressionManager.getValue('relaxed') || 0,
+                        window.smilePulse * 0.35
+                    ));
+                }
                 
-                // --- 1.4 & 2.4 Procedural Quaternions (Emotion-to-Motion) ---
+                // --- Procedural pose per animation state ---
                 window.animTimer += clampedDelta;
                 let tRU = new THREE.Euler(0, 0, -1.2);
                 let tLU = new THREE.Euler(0, 0, 1.2);
@@ -285,28 +283,24 @@
                 let tLFingers = new THREE.Euler(0, 0, 0);
                 
                 if (window.currentAnimation === 'startup') {
-                    // First image: Custom Wave / Hello Pose
                     tRU.set(0.09, 1.01, -0.4);
                     tRL.set(-0.19, 0.01, 1.9);
                     tRH.set(0.26, 0, 0);
                     tRFingers.set(0, 0, 0);
-                    
                     tLU.set(-0.3, 0, 0.9);
                     tLL.set(0, 0, 1.1);
                     tLH.set(0, 0, 0);
                     tLFingers.set(0, 0, 0);
                     
-                    // Wind Effect logic (Hair only)
                     if (currentVrm.springBoneManager) {
                         windActive = true;
-                        const windPower = Math.max(0, 1.0 - (window.animTimer / 2.5)); // Fades out over 2.5s
-                        const windX = (Math.sin(time * 5) * 0.1 + 0.3) * windPower; // Gusty wind to the right
+                        const windPower = Math.max(0, 1.0 - (window.animTimer / 2.5));
+                        const windX = (Math.sin(time * 5) * 0.1 + 0.3) * windPower;
                         
                         currentVrm.springBoneManager.joints.forEach((joint) => {
                             if (!joint._originalGravityDir) {
                                 joint._originalGravityDir = joint.settings.gravityDir.clone();
                             }
-                            // ONLY apply wind to hair joints, not skirt!
                             if (joint.bone && joint.bone.name.toLowerCase().includes('hair')) {
                                 joint.settings.gravityDir.set(
                                     joint._originalGravityDir.x + windX,
@@ -314,14 +308,12 @@
                                     joint._originalGravityDir.z
                                 ).normalize();
                             } else {
-                                // Keep non-hair joints (like skirt) at their original gravity
                                 joint.settings.gravityDir.copy(joint._originalGravityDir);
                             }
                         });
                     }
                 } else if (window.currentAnimation === 'thinking') {
                     if (windActive && currentVrm.springBoneManager) {
-                        // Reset wind when animation changes
                         currentVrm.springBoneManager.joints.forEach((joint) => {
                             if (joint._originalGravityDir) {
                                 joint.settings.gravityDir.copy(joint._originalGravityDir);
@@ -329,46 +321,36 @@
                         });
                         windActive = false;
                     }
-                    // Thinking pose (New confident pose from screenshot)
                     tRU.set(-0.9, 0.36, -1.14);
                     tRL.set(-1.34, -0.24, 1.9); 
                     tRH.set(0, 0.76, 0);
                     tRFingers.set(0, 0, 0);
-                    
                     tLU.set(-0.3, 0, 0.9);
                     tLL.set(0, 0, 1.1);
                     tLH.set(-0.09, 0, 0);
                     tLFingers.set(0, 0, -0.05);
                     tNeck.set(-0.05, -0.15, 0.05);
                 } else if (window.currentAnimation === 'happy' || window.currentAnimation === 'excited') {
-                    // Second image: Sweet / Heart pose for when complimented
                     tRU.set(-1.44, 0.41, 0.46);
                     tRL.set(0.46, 2.71, 0.96);
                     tRH.set(1.91, -0.19, 0.46);
                     tRFingers.set(0, 0, 0.3);
-                    
                     tLU.set(1.41, 0.16, 0.91);
                     tLL.set(0.31, -0.14, 1.31);
                     tLH.set(1.26, 0.41, 0.06);
                     tLFingers.set(0, 0, 0);
-                    
-                    tNeck.set(0.1, 0, 0); // Slight cute head tilt
+                    tNeck.set(0.1, 0, 0);
                 } else if (window.currentAnimation === 'stop') {
-                    // "Stop Boss" pose based on user's exact dialed numbers!
                     tRU.set(-0.44, 1.31, -0.34);
                     tRL.set(-0.34, 0.61, 1.66);
                     tRH.set(-0.09, -0.09, 0.36);
                     tRFingers.set(0, 0, 0);
-                    
-                    // Left arm relaxed on hip (since 0,0,0 causes stiff T-pose)
                     tLU.set(0.2, 0, 1.2); 
                     tLL.set(0, 0, 1.5);
                     tLH.set(0, 0, 0);
                     tLFingers.set(0, 0, 0);
-                    
-                    tNeck.set(-0.1, 0.2, 0.05); // Scolding head tilt
+                    tNeck.set(-0.1, 0.2, 0.05);
                 } else if (window.currentAnimation === 'talking') {
-                    // Conversational hand gesturing
                     tRU.set(-0.3, 0, Math.sin(window.animTimer * 2) * 0.1 - 1.0);
                     tRL.set(0, 0, 0.5 + Math.sin(window.animTimer * 2) * 0.2);
                     tLU.set(-0.2, 0, -Math.sin(window.animTimer * 2 + 0.5) * 0.1 + 1.0);
@@ -376,10 +358,9 @@
                 } else if (window.currentAnimation === 'listening') {
                     tLU.set(0, 0, 1.2); 
                     tLL.set(0, 0, 0); 
-                    tNeck.set(-0.1, 0, 0.05); // Attentive head tilt up
+                    tNeck.set(-0.1, 0, 0.05);
                 } else {
                     if (windActive && currentVrm.springBoneManager) {
-                        // Reset wind when animation changes
                         currentVrm.springBoneManager.joints.forEach((joint) => {
                             if (joint._originalGravityDir) {
                                 joint.settings.gravityDir.copy(joint._originalGravityDir);
@@ -387,7 +368,6 @@
                         });
                         windActive = false;
                     }
-                    // idle — relaxed, arms down, gentle organic sway
                     const idleNoise1 = Math.sin(time * 0.37) * 0.4 + Math.sin(time * 0.11) * 0.6;
                     const idleNoise2 = Math.sin(time * 0.29 + 1.7) * 0.4 + Math.sin(time * 0.13 + 0.5) * 0.6;
                     tRU.set(0.05 + idleNoise1 * 0.03, 0, -1.35 + idleNoise1 * 0.05);
@@ -396,7 +376,6 @@
                     tLL.set(0, 0, 0.1);
                 }
                 
-                // === DEBUG OVERRIDE ===
                 if (window.DEBUG_POSE_MODE && document.getElementById('debug_enable').checked) {
                     tRU.set(
                         parseFloat(document.getElementById('ru_x').value),
@@ -414,7 +393,6 @@
                         parseFloat(document.getElementById('rh_z').value)
                     );
                     tRFingers.set(0, 0, parseFloat(document.getElementById('rf_c').value));
-                    
                     tLU.set(
                         parseFloat(document.getElementById('lu_x').value),
                         parseFloat(document.getElementById('lu_y').value),
@@ -434,11 +412,10 @@
                     tNeck.set(-0.05, -0.15, 0.05);
                 }
                 
-                // Safe Quaternion Slerp helper (prevents Euler gimbal lock twisting!)
                 const applySlerp = (bone, eulerTarget, speed) => {
                     if (bone) {
                         const targetQuat = new THREE.Quaternion().setFromEuler(eulerTarget);
-                        const t = 1 - Math.pow(1 - Math.min(clampedDelta * speed, 1), 2); // ease-out
+                        const t = 1 - Math.pow(1 - Math.min(clampedDelta * speed, 1), 2);
                         bone.quaternion.slerp(targetQuat, t);
                     }
                 };
@@ -463,7 +440,6 @@
                 applySlerp(lLittle, tLFingers, 5);
                 applySlerp(lThumb, tLFingers, 5);
                 
-                // --- 2.3 Eye Contact (LookAt) ---
                 if (currentVrm.lookAt) {
                     const headBone = h.getNormalizedBoneNode('head');
                     if (headBone) {
@@ -494,9 +470,6 @@
         });
 
         window.updateLipSync = function(volume) {
-            // Kept for backward compatibility with any code still calling
-            // volumeChanged directly, but real mouth shape now comes from
-            // updateViseme() below.
             window.lipSyncVolume = volume;
         };
 
@@ -528,7 +501,6 @@
                 
                 currentVrm.expressionManager.setValue(vrmEmot, 1.0);
                 
-                // Emotion-to-Motion triggering
                 if (emotion === 'talking' || emotion === 'happy') {
                     window.currentAnimation = 'talking';
                 } else if (emotion === 'thinking' || emotion === 'curious') {
@@ -543,7 +515,41 @@
             }
         };
 
-        // --- 1.1 Background 404 Logging & 3.1 Dynamic Backgrounds ---
+        // --- Post-response smile trigger, called from Python after a reply finishes ---
+        window.flashSmile = function() {
+            window.smilePulse = 1.0;
+        };
+
+        // --- Status readout (listening / thinking / executing) ---
+        // Both listening and the new thinking/executing states write into
+        // the same glass-panel element so only one status shows at a time.
+        window.setStatusText = function(html) {
+            const indicator = document.getElementById('status-indicator');
+            if (!html) {
+                indicator.style.display = 'none';
+                indicator.innerHTML = '';
+                return;
+            }
+            indicator.innerHTML = html;
+            indicator.style.display = 'block';
+        };
+
+        const MIC_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="white" style="vertical-align: middle; margin-right: 8px; margin-bottom: 3px;">
+            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+            <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+        </svg>`;
+
+        window.setListening = function(isListening) {
+            window.setStatusText(isListening ? (MIC_SVG + 'Listening...') : '');
+        };
+
+        // Driven from Python at each real pipeline stage — no fake/rotating
+        // text here, since a status claiming to "search" when nothing is
+        // actually being searched would be misleading rather than polish.
+        window.setStatusTextFromPython = function(text) {
+            window.setStatusText(text);
+        };
+
         window.setBackground = function(bgName) {
             if (bgName === 'none') {
                 document.body.style.backgroundImage = "none";
@@ -554,12 +560,11 @@
             const img = new Image();
             img.onload = function() {
                 document.body.style.backgroundImage = "url('" + url + "')";
-                // 3.1 Ambient Lighting Matching
                 if (bgName.includes('scifi')) {
-                    light.color.setHex(0xd0ffff); // Cool cyan
+                    light.color.setHex(0xd0ffff);
                     ambientLight.color.setHex(0x5555aa);
                 } else {
-                    light.color.setHex(0xffffff); // Default
+                    light.color.setHex(0xffffff);
                     ambientLight.color.setHex(0xaaaaaa);
                 }
             };
@@ -571,23 +576,13 @@
 
         window.setMode = function(mode) {
             if (mode === 'cinematic') {
-                document.body.style.backgroundColor = "black";
                 window.setBackground('chatgpt_bg.png'); 
                 camera.position.set(0.0, 1.25, 2.1);
                 camera.lookAt(0.0, 1.2, 0.0);
             } else if (mode === 'widget') {
                 document.body.style.backgroundImage = "radial-gradient(circle, rgba(0,25,50,0.8) 0%, rgba(0,0,0,0) 70%)";
-                camera.position.set(0.0, 1.25, 2.1); 
-                camera.lookAt(0.0, 1.2, 0.0);
-            }
-        };
-
-        window.setListening = function(isListening) {
-            const indicator = document.getElementById('status-indicator');
-            if (isListening) {
-                indicator.style.display = 'block';
-            } else {
-                indicator.style.display = 'none';
+                camera.position.set(0.0, 1.35, 1.8); 
+                camera.lookAt(0.0, 1.35, 0.0);
             }
         };
 
@@ -601,13 +596,16 @@
                 if (bridge.visemeChanged) {
                     bridge.visemeChanged.connect(window.updateViseme);
                 }
-                
-                // Register new background signal if it exists
+                if (bridge.statusTextChanged) {
+                    bridge.statusTextChanged.connect(window.setStatusTextFromPython);
+                }
+                if (bridge.smilePulseRequested) {
+                    bridge.smilePulseRequested.connect(window.flashSmile);
+                }
                 if (bridge.backgroundChanged) {
                     bridge.backgroundChanged.connect(window.setBackground);
                 }
                 
-                // FORCE initialize cinematic mode instantly so we never get a black screen due to race conditions
                 window.setMode('cinematic');
             });
         }

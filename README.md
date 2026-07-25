@@ -1,286 +1,169 @@
+<div align="center">
+
 # 🤖 Charlie AI Assistant
 
-> **An intelligent modular AI desktop assistant built with Python, featuring offline voice interaction, a real-time 3D VRM avatar, intelligent memory, and desktop automation.**
+<img src="assets/screenshots/01_Charlie_Hero.png" alt="Charlie AI Assistant Hero" width="100%">
 
-![Status](https://img.shields.io/badge/Status-Active%20Development-orange)
-![Python](https://img.shields.io/badge/Python-3.12-blue)
-![Platform](https://img.shields.io/badge/Platform-Windows-green)
-![License](https://img.shields.io/badge/License-MIT-purple)
+**An intelligent modular AI desktop assistant built with Python, featuring offline voice interaction, a real-time 3D VRM avatar, intelligent memory, and desktop automation.**
 
----
+[![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![Platform](https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white)](https://microsoft.com)
+[![License](https://img.shields.io/badge/License-MIT-4CAF50?style=for-the-badge)](LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge)](CONTRIBUTING.md)
 
-<p align="center">
-  <img src="assets/screenshots/01_Charlie_Hero.png" width="900" alt="Charlie AI Assistant">
-</p>
+[Watch the Demo Video](assets/demo/Charlie_Demo_1080p.mp4) • [Report Bug](https://github.com/harshvardhanj515-beep/charlie-ai-assistant/issues) • [Request Feature](https://github.com/harshvardhanj515-beep/charlie-ai-assistant/issues)
 
-<p align="center">
-  <b>Charlie — Your Intelligent Desktop AI Assistant</b><br>
-  Voice • Automation • Memory • 3D Avatar • Productivity
-</p>
+</div>
 
 ---
 
-# 🎬 Demo
+## 🚀 Overview
 
-Watch Charlie in action:
+Charlie is a professional-grade modular AI desktop assistant designed to deliver an intelligent, voice-driven desktop experience completely offline. 
 
-📹 **Demo Video**
+Unlike traditional cloud chatbots, Charlie interacts directly with your local environment, understands natural voice commands, automates repetitive tasks, manages productivity, and communicates through a highly expressive real-time 3D VRM avatar.
 
-[▶ Charlie AI Assistant Demo](assets/demo/Charlie_Demo_1080p.mp4)
-
----
-
-# 🚀 Overview
-
-Charlie is a modular AI desktop assistant built entirely in Python to deliver an intelligent, voice-driven desktop experience.
-
-Unlike traditional chatbots, Charlie can interact directly with your computer, understand voice commands, automate repetitive tasks, manage productivity, and communicate through an expressive real-time 3D VRM avatar.
-
-The project follows a modular architecture, making it easy to extend with new capabilities while keeping the code organized, scalable, and maintainable.
+Built with a scalable, modular architecture, Charlie is designed to be easily extensible for developers wanting to build their own local AI ecosystem.
 
 ---
 
-# ✨ Features
+## ✨ Key Features
 
-- 🎤 Wake Word Detection
-- 🗣️ Speech-to-Text
-- 🔊 Offline Text-to-Speech (Piper)
-- 👩 Real-Time 3D VRM Avatar
-- 👄 Real-Time Lip Sync
-- 😊 Facial Expressions
-- 🧠 Intelligent Memory
-- 📅 Calendar Management
-- 📋 Task Management
-- 📇 Contact Management
-- 💻 Desktop Automation
-- 🌐 Browser Automation
-- 📸 Screenshot Capture
-- 🎥 Camera Integration
-- ⚙️ Modular Architecture
-- 🔌 Easily Extendable Modules
+- **🎤 Offline Voice Interaction**: Lightning-fast local Wake Word Detection & Speech-to-Text via Whisper.
+- **🔊 Natural Text-to-Speech**: High-quality offline voice synthesis.
+- **👩 Real-Time 3D Avatar**: Fully integrated VRM 3D model with real-time lip sync and facial expressions.
+- **🧠 Intelligent Local Memory**: Contextual long-term and short-term memory utilizing local LLMs.
+- **💻 Desktop & Browser Automation**: Control local apps, execute macros, and manipulate web browsers autonomously.
+- **📸 Vision Capabilities**: Screenshot analysis and webcam integrations.
+- **📅 Productivity Suite**: Built-in Calendar, Task, and Contact management.
+- **🔌 Highly Extensible**: Plug-and-play architecture for adding new capability modules.
 
 ---
 
-# 📸 Screenshots
+## 📸 Showcase
 
-## 🏠 Hero
-
-<p align="center">
-<img src="assets/screenshots/01_Charlie_Hero.png" width="900">
-</p>
-
----
-
-## 🎤 Voice Interaction
-
-<p align="center">
-<img src="assets/screenshots/02_Charlie_Listening.png" width="900">
-</p>
-
----
-
-## 🗣️ Speaking Animation
-
-<p align="center">
-<img src="assets/screenshots/03_Charlie_Speaking.png" width="900">
-</p>
+<div align="center">
+  <img src="assets/screenshots/02_Charlie_Listening.png" width="48%">
+  <img src="assets/screenshots/03_Charlie_Speaking.png" width="48%">
+  <i>Voice Interaction & Speaking Animations</i>
+</div>
+<br>
+<div align="center">
+  <img src="assets/screenshots/04_Charlie_Desktop_Control.png" width="48%">
+  <img src="assets/screenshots/05_Charlie_Browser_Control.png" width="48%">
+  <i>Desktop Automation & Media Control</i>
+</div>
+<br>
+<div align="center">
+  <img src="assets/screenshots/06_Charlie_Desktop_Mode.png" width="80%">
+  <br>
+  <i>Floating Desktop Assistant Mode</i>
+</div>
 
 ---
 
-## 💻 Desktop Automation
+## 🏗️ System Architecture
 
-<p align="center">
-<img src="assets/screenshots/04_Charlie_Desktop_Control.png" width="900">
-</p>
+Charlie is structured around a centralized modular brain that routes input and intent to specialized capability modules.
 
----
+```mermaid
+graph TD
+    User((User))
+    User -->|Voice| STT[Speech-to-Text Module]
+    User -->|Text| GUI[UI / Command Line]
 
-## 🌐 Browser & Media Control
+    STT --> Brain{Charlie Core / Brain}
+    GUI --> Brain
 
-<p align="center">
-<img src="assets/screenshots/05_Charlie_Browser_Control.png" width="900">
-</p>
-
----
-
-## 🖥️ Desktop Assistant
-
-<p align="center">
-<img src="assets/screenshots/06_Charlie_Desktop_Mode.png" width="900">
-</p>
-
----
-
-# 🏗️ Architecture
-
-```text
-                   User
-
-                     │
-
-             Voice Commands
-
-                     │
-
-         Speech Recognition
-
-                     │
-
-              Charlie Brain
-
-      ┌──────────┼──────────┐
-      │          │          │
-      │          │          │
-   Memory   Automation   Avatar
-      │          │          │
-      │          │          │
- Calendar   Desktop      VRM Engine
-  Tasks      Browser     Lip Sync
- Contacts    Camera      Animation
+    Brain -->|Memory Storage| DB[(SQLite Database)]
+    Brain -->|Natural Language| LLM[Local LLM / Ollama]
+    
+    Brain -->|Actions| Modules[Capability Modules]
+    
+    subgraph Capability Modules
+        Desktop[Desktop Control]
+        Browser[Browser Automation]
+        Calendar[Calendar & Tasks]
+        Vision[Camera / Screen]
+    end
+    
+    Modules --> Brain
+    Brain --> TTS[Text-to-Speech Module]
+    TTS --> Engine[Audio Engine]
+    TTS --> LipSync[Lip Sync Processor]
+    
+    LipSync --> VRM[3D Avatar Engine]
+    Brain -->|Expressions| VRM
+    
+    VRM --> Render[Display to User]
 ```
 
 ---
 
-# ⚙️ Tech Stack
+## 🛠️ Installation & Setup
 
-## Languages
+### Prerequisites
+- Python 3.12+
+- Windows OS (Linux/macOS support planned)
+- [Ollama](https://ollama.ai) installed locally (if using local inference)
 
-- Python
-- HTML
-- CSS
-- JavaScript
+### Quick Start
 
-## Frameworks & Libraries
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/harshvardhanj515-beep/charlie-ai-assistant.git
+   cd charlie-ai-assistant
+   ```
 
-- Flask
-- Three.js
-- Three-VRM
-- Piper TTS
-- SQLite
-- SpeechRecognition
+2. **Set up the virtual environment**
+   ```bash
+   python -m venv venv
+   venv\Scripts\activate
+   ```
 
-## Development Tools
+3. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-- Git
-- GitHub
-- VS Code
-
----
-
-# 📂 Project Structure
-
-```text
-charlie-ai-assistant/
-│
-├── assets/
-│   ├── avatar/
-│   ├── demo/
-│   └── screenshots/
-│
-├── config/
-├── modules/
-├── requirements.txt
-├── main.py
-├── start_charlie.vbs
-├── LICENSE
-└── README.md
-```
+4. **Run Charlie**
+   ```bash
+   python main.py
+   ```
 
 ---
 
-# 🛠️ Installation
+## 🗺️ Roadmap
 
-```bash
-git clone https://github.com/harshvardhanj515-beep/charlie-ai-assistant.git
-
-cd charlie-ai-assistant
-
-python -m venv venv
-
-venv\Scripts\activate
-
-pip install -r requirements.txt
-
-python main.py
-```
+- [x] Base Architecture & Local LLM Integration
+- [x] VRM 3D Avatar Engine & Real-Time Lip Sync
+- [x] Core Desktop Automation & Browser Control
+- [ ] 🎵 Spotify / Media Player Integration
+- [ ] 📧 Mail & Calendar Sync (Google Workspace)
+- [ ] 🤖 RAG-based Long Term Document Memory
+- [ ] ☁️ Cloud Sync Capabilities
+- [ ] 📱 Mobile App Companion
 
 ---
 
-# 🎯 Project Goals
+## 🤝 Contributing
 
-Charlie is designed to become an intelligent desktop companion capable of:
+We welcome contributions from the open-source community! 
 
-- Voice-based interaction
-- Productivity assistance
-- Desktop automation
-- Intelligent memory
-- AI-powered task execution
-- Natural avatar communication
-- Personal organization
+Please read our [Contributing Guidelines](CONTRIBUTING.md) to get started. Be sure to also review our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ---
 
-# 🗺️ Roadmap
+## 👨‍💻 Author
 
-## ✅ Current Features
+**Harshvardhan Jadhav**  
+*Python Developer | AI & Automation Enthusiast | Cybersecurity Learner*
 
-- Offline Voice Assistant
-- Desktop Automation
-- Browser Automation
-- Camera Integration
-- Calendar Support
-- Task Management
-- Contact Management
-- Intelligent Memory
-- VRM Avatar
-- Lip Sync
+Currently building intelligent software, AI assistants, and exploring modern system design.  
+If you find this project helpful or inspiring, consider giving it a ⭐!
 
 ---
 
-## 🚀 Planned Features
+## 📄 License
 
-- 🎵 Music Playback
-- 📧 Gmail Integration
-- 🌦️ Weather Support
-- 🤖 AI Calling Agent
-- 🧠 Enhanced Long-Term Memory
-- 🖥️ Cross-Platform Support
-- 📱 Mobile Companion
-- ☁️ Cloud Synchronization
-- 🔒 Advanced Security Features
-
----
-
-# 🤝 Contributing
-
-Contributions, feature suggestions, and bug reports are welcome.
-
-If you'd like to improve Charlie, feel free to fork the repository and submit a pull request.
-
----
-
-# 📄 License
-
-This project is licensed under the MIT License.
-
-See the [LICENSE](LICENSE) file for details.
-
----
-
-# 👨‍💻 Author
-
-## Harshvardhan Jadhav
-
-**B.Tech Computer Science Student**
-
-Python Developer • AI & Automation Enthusiast • Cybersecurity Learner
-
-Currently building intelligent software, AI assistants, and automation tools while exploring cybersecurity and modern system design.
-
----
-
-<p align="center">
-
-⭐ If you like Charlie, consider giving the repository a Star!
-
-</p>
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

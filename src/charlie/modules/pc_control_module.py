@@ -420,13 +420,13 @@ def system_status():
 
 
 def _load_tasks():
-    path = os.path.join(os.path.dirname(__file__), "..", TASKS_FILE)
+    path = os.path.join(os.path.dirname(__file__), "..", "..", "..", TASKS_FILE)
     with open(path, "r") as f:
         return json.load(f)
 
 
 def _save_tasks(data):
-    path = os.path.join(os.path.dirname(__file__), "..", TASKS_FILE)
+    path = os.path.join(os.path.dirname(__file__), "..", "..", "..", TASKS_FILE)
     with open(path, "w") as f:
         json.dump(data, f, indent=2)
 

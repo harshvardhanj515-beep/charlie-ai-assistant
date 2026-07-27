@@ -71,8 +71,8 @@ def _estimate_viseme(pcm, sample_rate):
 class StreamingPiperTTS:
     def __init__(self):
         self._lock = threading.Lock()
-        model_path = os.path.join(os.path.dirname(__file__), "..", "en_US-hfc_female-medium.onnx")
-        config_path = os.path.join(os.path.dirname(__file__), "..", "en_US-hfc_female-medium.onnx.json")
+        model_path = os.path.join(os.path.dirname(__file__), "..", "..", "..", "en_US-hfc_female-medium.onnx")
+        config_path = os.path.join(os.path.dirname(__file__), "..", "..", "..", "en_US-hfc_female-medium.onnx.json")
         print("[TTS] Loading Piper TTS voice model...")
         self.voice = PiperVoice.load(model_path, config_path=config_path)
         self.sample_rate = self.voice.config.sample_rate

@@ -3,7 +3,7 @@ import os
 import time
 import json
 
-DB_PATH = os.path.join(os.path.dirname(__file__), "..", "brain_memory.db")
+DB_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "..", "brain_memory.db")
 
 class MemoryManager:
     def __init__(self):

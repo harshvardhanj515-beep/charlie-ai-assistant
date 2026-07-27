@@ -11,7 +11,7 @@ import os
 import time
 
 
-CONTACTS_FILE = os.path.join(os.path.dirname(__file__), "..", "config", "contacts.json")
+CONTACTS_FILE = os.path.join(os.path.dirname(__file__), "..", "..", "..", "config", "contacts.json")
 
 
 class ContactsManager:

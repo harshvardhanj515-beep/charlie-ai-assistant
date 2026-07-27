@@ -5,7 +5,7 @@ from PyQt5.QtCore import Qt, QUrl, QObject, pyqtSignal
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWebChannel import QWebChannel
 
-ASSET_DIR = os.path.join(os.path.dirname(__file__), "..", "assets", "avatar")
+ASSET_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "..", "assets", "avatar")
 
 import http.server
 import socketserver

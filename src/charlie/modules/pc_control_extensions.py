@@ -196,7 +196,7 @@ def mute_toggle(params):
 def screenshot(params):
     try:
         from PIL import ImageGrab
-        out_dir = os.path.join(os.path.dirname(__file__), "..", "screenshots")
+        out_dir = os.path.join(os.path.dirname(__file__), "..", "..", "..", "screenshots")
         os.makedirs(out_dir, exist_ok=True)
         path = os.path.join(out_dir, f"screenshot_{int(time.time())}.png")
         ImageGrab.grab().save(path)

@@ -11,7 +11,7 @@ cffi==2.0.0
 charset-normalizer==3.4.7
 click==8.4.2
 colorama==0.4.6
-comtypes==1.4.16
+comtypes==1.4.16; sys_platform == 'win32'
 ctranslate2==4.8.1
 deepface==0.0.93
 distro==1.9.0
@@ -66,7 +66,7 @@ piper-tts==1.4.2
 protobuf==4.25.9
 psutil==5.9.8
 PyAutoGUI==0.9.54
-pycaw==20251023
+pycaw==20251023; sys_platform == 'win32'
 pycparser==3.0
 pydantic==2.13.4
 pydantic_core==2.46.4
